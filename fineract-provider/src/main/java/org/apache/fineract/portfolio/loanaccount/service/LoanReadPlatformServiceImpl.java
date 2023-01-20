@@ -1000,9 +1000,6 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService {
             final String closureLoanAccountNo = rs.getString("closureLoanAccountNo");
             final BigDecimal topupAmount = rs.getBigDecimal("topupAmount");
 
-            final Long linkSavingsAccountId = JdbcSupport.getLong(rs, "linkSavingsAccountId");
-            final String linkSavingsAccountNo = rs.getString("linkSavingsAccountNo");
-            final PortfolioAccountData linkedAccount = PortfolioAccountData.lookup(linkSavingsAccountId, linkSavingsAccountNo);
 
             LoanAccountData loanAccountData = LoanAccountData.basicLoanDetails(id, accountNo, status, externalId, clientId, clientAccountNo, clientName, clientExternalId,
                     clientOfficeId, groupData, loanType, loanProductId, loanProductName, loanProductDescription,
@@ -1019,7 +1016,12 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService {
                     createStandingInstructionAtDisbursement, isvariableInstallmentsAllowed, minimumGap, maximumGap, loanSubStatus,
                     canUseForTopup, isTopup, closureLoanId, closureLoanAccountNo, topupAmount, isEqualAmortization,
                     fixedPrincipalPercentagePerInstallment);
-            loanAccountData.setLinkedAccount(linkedAccount);
+            final Long linkSavingsAccountId = JdbcSupport.getLong(rs, "linkSavingsAccountId");
+            final String linkSavingsAccountNo = rs.getString("linkSavingsAccountNo");
+            if (linkSavingsAccountId != null) {
+                final PortfolioAccountData linkedAccount = PortfolioAccountData.lookup(linkSavingsAccountId, linkSavingsAccountNo);
+                loanAccountData.setLinkedAccount(linkedAccount);
+            }
             return loanAccountData;
         }
     }
