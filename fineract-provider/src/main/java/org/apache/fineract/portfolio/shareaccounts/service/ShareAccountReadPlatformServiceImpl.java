@@ -265,7 +265,7 @@ public class ShareAccountReadPlatformServiceImpl implements ShareAccountReadPlat
             this.purchasedShares = purchasedShares;
             StringBuilder buff = new StringBuilder().append("sa.id as id, sa.external_id as externalId, sa.status_enum as statusEnum, ")
                     .append("sa.savings_account_id, msa.account_no as savingsAccNo, ")
-                    .append("c.id as clientId, c.display_name as clientName, ")
+                    .append("c.id as clientId, c.display_name as clientName, c.external_id as clientExternalId, ")
                     .append("sa.account_no as accountNo, sa.total_approved_shares as approvedShares, sa.total_pending_shares as pendingShares, ")
                     .append("sa.savings_account_id as savingsAccountNo, sa.minimum_active_period_frequency as minimumactivePeriod, ")
                     .append("sa.minimum_active_period_frequency_enum as minimumactivePeriodEnum, ")
@@ -304,6 +304,7 @@ public class ShareAccountReadPlatformServiceImpl implements ShareAccountReadPlat
             final String savingsAccountNumber = rs.getString("savingsAccNo");
             final Long clientId = JdbcSupport.getLong(rs, "clientId");
             final String clientName = rs.getString("clientName");
+            final String clientExternalId = rs.getString("clientExternalId");
             final Long productId = rs.getLong("productId");
             final String productName = rs.getString("productName");
             final Long totalApprovedShares = JdbcSupport.getLong(rs, "approvedShares");
@@ -371,10 +372,11 @@ public class ShareAccountReadPlatformServiceImpl implements ShareAccountReadPlat
             final String shortProductName = null;
             final ShareAccountSummaryData summary = new ShareAccountSummaryData(id, accountNo, externalId, productId, productName,
                     shortProductName, status, currency, totalApprovedShares, totalPendingShares, timeline);
-            return new ShareAccountData(id, accountNo, externalId, savingsAccountId, savingsAccountNumber, clientId, clientName, productId,
+            ShareAccountData shareAccountData = new ShareAccountData(id, accountNo, externalId, savingsAccountId, savingsAccountNumber, clientId, clientName, productId,
                     productName, status, timeline, currency, summary, charges, purchasedShares, lockinPeriodFrequency,
                     lockinPeriodFrequencyType, minimumActivePeriod, minimumActivePeriodType, allowdividendsforinactiveclients);
-
+            shareAccountData.setClientExternalId(clientExternalId);
+            return shareAccountData;
         }
 
         public String schema() {

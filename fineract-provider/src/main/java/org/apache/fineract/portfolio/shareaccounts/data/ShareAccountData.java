@@ -46,6 +46,8 @@ public class ShareAccountData implements Serializable, AccountData {
 
     private String clientName;
 
+    private String clientExternalId;
+
     private Long defaultShares;
 
     private Long productId;
@@ -300,6 +302,10 @@ public class ShareAccountData implements Serializable, AccountData {
 
     public Long getId() {
         return this.id;
+    }
+
+    public void setClientExternalId(String clientExternalId) {
+        this.clientExternalId = clientExternalId;
     }
 
     public Collection<ShareAccountTransactionData> getPurchasedShares() {
