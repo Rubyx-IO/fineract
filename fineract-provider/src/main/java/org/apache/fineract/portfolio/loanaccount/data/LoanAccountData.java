@@ -170,7 +170,7 @@ public final class LoanAccountData {
     private final Integer loanProductCounter;
 
     // linkable account details
-    private final PortfolioAccountData linkedAccount;
+    private PortfolioAccountData linkedAccount;
     private final Collection<PortfolioAccountData> accountLinkingOptions;
 
     private final Boolean multiDisburseLoan;
@@ -448,6 +448,10 @@ public final class LoanAccountData {
 
     public void setClientExternalId(String clientExternalId) {
         this.clientExternalId = clientExternalId;
+    }
+    
+    public void setLinkedAccount(PortfolioAccountData linkedAccount ) {
+        this.linkedAccount = linkedAccount;
     }
 
     public BigDecimal getPrincipal() {
