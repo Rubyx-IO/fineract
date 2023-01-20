@@ -41,6 +41,7 @@ public class DepositAccountData {
     protected final String groupName;
     protected final Long clientId;
     protected final String clientName;
+    private String clientExternalId;
     protected final Long depositProductId;
     protected final String depositProductName;
     protected final Long fieldOfficerId;
@@ -315,6 +316,10 @@ public class DepositAccountData {
 
     public Long clientId() {
         return this.clientId;
+    }
+
+    public void setClientExternalId(String clientExternalId) {
+        this.clientExternalId = clientExternalId;
     }
 
     public Long groupId() {

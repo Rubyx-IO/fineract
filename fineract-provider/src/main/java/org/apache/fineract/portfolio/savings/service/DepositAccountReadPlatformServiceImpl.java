@@ -550,7 +550,7 @@ public class DepositAccountReadPlatformServiceImpl implements DepositAccountRead
         protected DepositAccountMapper() {
             final StringBuilder selectFieldsSqlBuilder = new StringBuilder(400);
             selectFieldsSqlBuilder.append("sa.id as id, sa.account_no as accountNo, sa.external_id as externalId, ");
-            selectFieldsSqlBuilder.append("c.id as clientId, c.display_name as clientName, ");
+            selectFieldsSqlBuilder.append("c.id as clientId, c.display_name as clientName, c.external_id as clientExternalId, ");
             selectFieldsSqlBuilder.append("g.id as groupId, g.display_name as groupName, ");
             selectFieldsSqlBuilder.append("sp.id as productId, sp.name as productName, ");
             selectFieldsSqlBuilder.append("s.id fieldOfficerId, s.display_name as fieldOfficerName, ");
@@ -643,6 +643,7 @@ public class DepositAccountReadPlatformServiceImpl implements DepositAccountRead
             final String groupName = rs.getString("groupName");
             final Long clientId = JdbcSupport.getLong(rs, "clientId");
             final String clientName = rs.getString("clientName");
+            final String clientExternalId = rs.getString("clientExternalId");
 
             final Long productId = rs.getLong("productId");
             final String productName = rs.getString("productName");
@@ -757,11 +758,13 @@ public class DepositAccountReadPlatformServiceImpl implements DepositAccountRead
                     totalPenaltyCharge, totalOverdraftInterestDerived, totalWithholdTax, null, null, availableBalance,
                     interestPostedTillDate);
 
-            return DepositAccountData.instance(id, accountNo, externalId, groupId, groupName, clientId, clientName, productId, productName,
+            DepositAccountData depositAccountData = DepositAccountData.instance(id, accountNo, externalId, groupId, groupName, clientId, clientName, productId, productName,
                     fieldOfficerId, fieldOfficerName, status, timeline, currency, nominalAnnualInterestRate, interestCompoundingPeriodType,
                     interestPostingPeriodType, interestCalculationType, interestCalculationDaysInYearType, minRequiredOpeningBalance,
                     lockinPeriodFrequency, lockinPeriodFrequencyType, withdrawalFeeForTransfers, summary, depositType,
                     minBalanceForInterestCalculation, withHoldTax, taxGroupData);
+            depositAccountData.setClientExternalId(clientExternalId);
+            return depositAccountData;
         }
     }
 
