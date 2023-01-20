@@ -74,6 +74,7 @@ public final class LoanAccountData {
     private final Long clientId;
     private final String clientAccountNo;
     private final String clientName;
+    private String clientExternalId;
     private final Long clientOfficeId;
     private final GroupGeneralData group;
     private final Long loanProductId;
@@ -324,6 +325,7 @@ public final class LoanAccountData {
 
         this.clientAccountNo = null;
         this.clientName = null;
+        this.clientExternalId = null;
         this.clientOfficeId = null;
         this.group = null;
         this.loanProductId = null;
@@ -438,6 +440,14 @@ public final class LoanAccountData {
 
     public String getClientName() {
         return clientName;
+    }
+
+    public String getClientExternalId() {
+        return clientExternalId;
+    }
+
+    public void setClientExternalId(String clientExternalId) {
+        this.clientExternalId = clientExternalId;
     }
 
     public BigDecimal getPrincipal() {
@@ -1213,7 +1223,7 @@ public final class LoanAccountData {
      * Used to send back loan account data with the basic details coming from query.
      */
     public static LoanAccountData basicLoanDetails(final Long id, final String accountNo, final LoanStatusEnumData status,
-            final String externalId, final Long clientId, final String clientAccountNo, final String clientName, final Long clientOfficeId,
+            final String externalId, final Long clientId, final String clientAccountNo, final String clientName, final String clientExternalId, final Long clientOfficeId,
             final GroupGeneralData group, final EnumOptionData loanType, final Long loanProductId, final String loanProductName,
             final String loanProductDescription, final boolean isLoanProductLinkedToFloatingRate, final Long fundId, final String fundName,
             final Long loanPurposeId, final String loanPurposeName, final Long loanOfficerId, final String loanOfficerName,
@@ -1278,7 +1288,7 @@ public final class LoanAccountData {
         final Boolean isRatesEnabled = false;
         final CollectionData delinquent = CollectionData.template();
 
-        return new LoanAccountData(id, accountNo, status, externalId, clientId, clientAccountNo, clientName, clientOfficeId, group,
+        LoanAccountData loanAccountData =  new LoanAccountData(id, accountNo, status, externalId, clientId, clientAccountNo, clientName, clientOfficeId, group,
                 loanType, loanProductId, loanProductName, loanProductDescription, isLoanProductLinkedToFloatingRate, fundId, fundName,
                 loanPurposeId, loanPurposeName, loanOfficerId, loanOfficerName, currencyData, proposedPrincipal, principal,
                 approvedPrincipal, netDisbursalAmount, totalOverpaid, inArrearsTolerance, termFrequency, termPeriodFrequencyType,
@@ -1298,6 +1308,8 @@ public final class LoanAccountData {
                 createStandingInstructionAtDisbursement, paidInAdvance, interestRatesPeriods, isVariableInstallmentsAllowed, minimumGap,
                 maximumGap, subStatus, canUseForTopup, clientActiveLoanOptions, isTopup, closureLoanId, closureLoanAccountNo, topupAmount,
                 isEqualAmortization, rates, isRatesEnabled, fixedPrincipalPercentagePerInstallment, delinquent);
+        loanAccountData.setClientExternalId(clientExternalId);
+        return loanAccountData;
     }
 
     /*
@@ -1327,7 +1339,7 @@ public final class LoanAccountData {
             loanProductConfigurableAttributes = acc.product.getloanProductConfigurableAttributes();
         }
 
-        return new LoanAccountData(acc.id, acc.accountNo, acc.status, acc.externalId, acc.clientId, acc.clientAccountNo, acc.clientName,
+        LoanAccountData loanAccountData = new LoanAccountData(acc.id, acc.accountNo, acc.status, acc.externalId, acc.clientId, acc.clientAccountNo, acc.clientName,
                 acc.clientOfficeId, acc.group, acc.loanType, acc.loanProductId, acc.loanProductName, acc.loanProductDescription,
                 acc.isLoanProductLinkedToFloatingRate, acc.fundId, acc.fundName, acc.loanPurposeId, acc.loanPurposeName, acc.loanOfficerId,
                 acc.loanOfficerName, acc.currency, acc.proposedPrincipal, acc.principal, acc.approvedPrincipal, acc.netDisbursalAmount,
@@ -1352,6 +1364,8 @@ public final class LoanAccountData {
                 acc.minimumGap, acc.maximumGap, acc.subStatus, acc.canUseForTopup, clientActiveLoanOptions, acc.isTopup, acc.closureLoanId,
                 acc.closureLoanAccountNo, acc.topupAmount, acc.isEqualAmortization, rates, isRatesEnabled,
                 acc.fixedPrincipalPercentagePerInstallment, delinquent);
+        loanAccountData.setClientExternalId(acc.clientExternalId);
+        return loanAccountData;
     }
 
     public static LoanAccountData associationsAndTemplate(final LoanAccountData acc, final Collection<LoanProductData> productOptions,
