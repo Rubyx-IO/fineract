@@ -829,7 +829,7 @@ public final class SavingsAccountData implements Serializable {
             final Collection<SavingsAccountTransactionData> transactions, final Collection<SavingsAccountChargeData> charges,
             final Collection<ChargeData> chargeOptions) {
 
-        return new SavingsAccountData(account.id, account.accountNo, account.depositType, account.externalId, account.groupId,
+            SavingsAccountData savingsAccountData = new SavingsAccountData(account.id, account.accountNo, account.depositType, account.externalId, account.groupId,
                 account.groupName, account.clientId, account.clientName, account.savingsProductId, account.savingsProductName,
                 account.fieldOfficerId, account.fieldOfficerName, account.status, account.subStatus, account.reasonForBlock,
                 account.timeline, account.currency, account.nominalAnnualInterestRate, account.interestCompoundingPeriodType,
@@ -844,6 +844,8 @@ public final class SavingsAccountData implements Serializable {
                 account.minOverdraftForInterestCalculation, account.withHoldTax, account.taxGroup, account.lastActiveTransactionDate,
                 account.isDormancyTrackingActive, account.daysToInactive, account.daysToDormancy, account.daysToEscheat,
                 account.savingsAmountOnHold);
+            savingsAccountData.clientExternalId = account.clientExternalId;
+            return savingsAccountData;
     }
 
     public static SavingsAccountData withClientTemplate(final Long clientId, final String clientName, final Long groupId,
