@@ -56,6 +56,7 @@ public final class SavingsAccountData implements Serializable {
     private final String groupName;
     private final Long clientId;
     private final String clientName;
+    private String clientExternalId;
     private final Long savingsProductId;
     private final String savingsProductName;
     private final Long fieldOfficerId;
@@ -298,6 +299,10 @@ public final class SavingsAccountData implements Serializable {
 
     public String getClientName() {
         return clientName;
+    }
+
+    public void setClientExternalId(String clientExternalId) {
+        this.clientExternalId = clientExternalId;
     }
 
     public String getAccountNo() {
