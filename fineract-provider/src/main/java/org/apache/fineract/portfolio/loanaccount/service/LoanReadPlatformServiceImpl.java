@@ -314,7 +314,7 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService {
         extraCriterias.add(hierarchySearchString);
         extraCriterias.add(hierarchySearchString);
 
-        sqlBuilder.append(" and aa.association_type_enum = ?");
+        sqlBuilder.append("and (aa.association_type_enum is null or aa.association_type_enum = ?)");
         extraCriterias.add(AccountAssociationType.LINKED_ACCOUNT_ASSOCIATION.getValue());
         arrayPos = arrayPos + 1;
 
