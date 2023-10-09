@@ -710,7 +710,8 @@ public class CollectionSheetReadPlatformServiceImpl implements CollectionSheetRe
                 .validateForGenerateCollectionSheetOfIndividuals(query.json());
 
         final LocalDate transactionDate = query.localDateValueOfParameterNamed(transactionDateParamName);
-        final String transactionDateStr = DateUtils.DEFAULT_DATE_FORMATER.format(transactionDate);
+        // final String transactionDateStr =
+        // DateUtils.DEFAULT_DATE_FORMATER.format(transactionDate);
 
         final AppUser currentUser = this.context.authenticatedUser();
         final String hierarchy = currentUser.getOffice().getHierarchy();
@@ -725,7 +726,7 @@ public class CollectionSheetReadPlatformServiceImpl implements CollectionSheetRe
                 checkForOfficeId,
                 checkForStaffId, sqlGenerator);
 
-        final SqlParameterSource namedParameters = new MapSqlParameterSource().addValue("dueDate", transactionDateStr)
+        final SqlParameterSource namedParameters = new MapSqlParameterSource().addValue("dueDate", transactionDate)
                 .addValue("officeHierarchy", officeHierarchy);
 
         if (checkForOfficeId) {
@@ -864,25 +865,27 @@ public class CollectionSheetReadPlatformServiceImpl implements CollectionSheetRe
                 DatabaseSpecificSQLGenerator sqlGenerator) {
 
             final StringBuilder sb = new StringBuilder(400);
+            sb.append("SELECT savingsdata.*, ");
+            sb.append("sp.short_name As productShortName, ");
+            sb.append("rc." + sqlGenerator.escape("name")
+                    + " as currencyName, rc.display_symbol as currencyDisplaySymbol, rc.internationalized_name_code as currencyNameCode ");
+            sb.append("FROM ( ");
             sb.append(
                     "SELECT (CASE WHEN sa.deposit_type_enum=100 THEN 'Saving Deposit' ELSE (CASE WHEN sa.deposit_type_enum=300 THEN 'Recurring Deposit' ELSE 'Current Deposit' END) END) as depositAccountType, cl.display_name As clientName, cl.id As clientId, ");
             sb.append("sa.id As savingsId, sa.account_no As accountId, sa.status_enum As accountStatusId, ");
-            sb.append("sp.short_name As productShortName, sp.id As productId, ");
+            sb.append("sa.product_id as productId, ");
             sb.append(
                     "sa.currency_code as currencyCode, sa.currency_digits as currencyDigits, sa.currency_multiplesof as inMultiplesOf, ");
-            sb.append("rc." + sqlGenerator.escape("name")
-                    + " as currencyName, rc.display_symbol as currencyDisplaySymbol, rc.internationalized_name_code as currencyNameCode, ");
+
             sb.append(
                     "SUM(COALESCE(mss.deposit_amount,0) - coalesce(mss.deposit_amount_completed_derived,0)) as dueAmount ");
             sb.append("FROM m_savings_account sa ");
             sb.append("JOIN m_client cl ON cl.id = sa.client_id ");
-            sb.append("JOIN m_savings_product sp ON sa.product_id=sp.id ");
             sb.append(
                     "LEFT JOIN m_deposit_account_recurring_detail dard ON sa.id = dard.savings_account_id AND dard.is_mandatory = true AND dard.is_calendar_inherited = false ");
             sb.append(
-                    "LEFT JOIN m_mandatory_savings_schedule mss ON mss.savings_account_id=sa.id AND mss.completed_derived = 0 AND mss.duedate <= :dueDate ");
+                    "LEFT JOIN m_mandatory_savings_schedule mss ON mss.savings_account_id=sa.id AND mss.completed_derived = false AND mss.duedate <= :dueDate ");
             sb.append("LEFT JOIN m_office of ON of.id = cl.office_id AND of.hierarchy like :officeHierarchy ");
-            sb.append("LEFT JOIN m_currency rc on rc." + sqlGenerator.escape("code") + " = sa.currency_code ");
             sb.append("WHERE sa.status_enum=300 and sa.group_id is null and sa.deposit_type_enum in (100,300,400) ");
             sb.append("and (cl.status_enum = 300 or (cl.status_enum = 600 and cl.closedon_date >= :dueDate)) ");
             if (checkForOfficeId) {
@@ -892,6 +895,10 @@ public class CollectionSheetReadPlatformServiceImpl implements CollectionSheetRe
                 sb.append("and sa.field_officer_id = :staffId ");
             }
             sb.append("GROUP BY cl.id , sa.id ORDER BY cl.id , sa.id ");
+            sb.append(") savingsdata ");
+            sb.append("JOIN m_savings_product sp ON savingsdata.productId=sp.id ");
+
+            sb.append("LEFT JOIN m_currency rc on rc." + sqlGenerator.escape("code") + " = savingsdata.currencyCode ");
 
             this.sql = sb.toString();
         }

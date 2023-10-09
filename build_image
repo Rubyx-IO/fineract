@@ -1,6 +1,5 @@
 # !/bin/bash
 ./gradlew :fineract-provider:jibDockerBuild -x test
-docker tag fineract:latest gcr.io/d6-dev/fineract/fineract-provider:1.8.3-rubyx
+docker tag fineract:latest gcr.io/d6-dev/fineract/fineract-provider:1.8.3-rubyx.1
 docker tag fineract:latest gcr.io/d6-dev/fineract/fineract-provider:latest
-docker tag fineract:latest gcr.io/d6-dev/fineract/fineract-provider:1.8.3
 docker image push -a gcr.io/d6-dev/fineract/fineract-provider
