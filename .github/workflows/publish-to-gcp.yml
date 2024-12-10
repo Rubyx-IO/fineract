@@ -1,0 +1,48 @@
+name: Fineract Publish to Rubyx GCP Artifact Registry
+
+on:
+  push:
+    branches:
+      - rubyx-* # Only run workflow on branches that start with rubyx-
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    env:
+      REGION: europe-west1
+      PROJECT_ID: ${{ vars.ARTIFACT_PROJECT_ID }}
+      CONTAINER_REGISTRY: ${{ vars.CONTAINER_REGISTRY }}
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4 # v4
+        with:
+          fetch-depth: 0
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'zulu'
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4 # v4.2.1
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.ARTIFACT_WIP }}
+          service_account: ${{ vars.ARTIFACT_GCP_SA }}
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+      - name: Configure Docker for GCP
+        run: gcloud auth configure-docker ${{ env.REPOSITORY }}
+      - name: Extract branch name
+        shell: bash
+        run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
+        id: extract_branch
+      - name: Build and Push to GCP Artifact Registry
+        run: |
+          ./gradlew --no-daemon --console=plain :fineract-provider:jib -x test -x cucumber \
+          -Djib.to.image=${{ env.CONTAINER_REGISTRY }}/${{ env.PROJECT_ID }}/fineract/server \
+          -Djib.to.tags=${{ steps.extract_branch.outputs.branch }} \
+          -Djib.from.platforms=linux/amd64,linux/arm64
