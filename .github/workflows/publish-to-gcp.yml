@@ -36,7 +36,7 @@ jobs:
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
       - name: Configure Docker for GCP
-        run: gcloud auth configure-docker ${{ env.CONTAINER_REGISTRY }}
+        run: gcloud info && gcloud auth configure-docker ${{ env.CONTAINER_REGISTRY }}
       - name: Extract branch name
         shell: bash
         run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
