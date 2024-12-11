@@ -15,7 +15,7 @@ jobs:
     env:
       REGION: europe-west1
       PROJECT_ID: ${{ vars.ARTIFACT_PROJECT_ID }}
-      CONTAINER_REGISTRY: ${{ vars.CONTAINER_REGISTRY }}
+      CONTAINER_REGISTRY: ${{ vars.ARTIFACT_CONTAINER_REGISTRY }}
     steps:
       - name: Checkout Source Code
         uses: actions/checkout@v4 # v4
@@ -36,7 +36,7 @@ jobs:
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
       - name: Configure Docker for GCP
-        run: gcloud auth configure-docker ${{ env.REPOSITORY }}
+        run: gcloud auth configure-docker ${{ env.CONTAINER_REGISTRY }}
       - name: Extract branch name
         shell: bash
         run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT

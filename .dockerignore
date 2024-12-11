@@ -9,3 +9,6 @@
 # Incremental "docker build" is faster if we can modify the Dockerfile
 # without "COPY ." re-transferring everything into the builder container.
 Dockerfile
+
+# Ignore generated credentials from google-github-actions/auth
+gha-creds-*.json
