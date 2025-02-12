@@ -1,0 +1,15 @@
+tasks:
+  # command-0:
+  #     command: |
+  #         # NB MySQL on GitPod.io is currently quite slow.
+  #         # Using authentication_string= instead of password= due to mysql major version difference
+  #         mysql -e "USE mysql;\nUPDATE user SET authentication_string=PASSWORD('mysql') WHERE user='root';\nFLUSH PRIVILEGES;\n"
+  #         ./gradlew createDB -PdbName=fineract_tenants
+  #         ./gradlew createDB -PdbName=fineract_default
+  #         ./gradlew build -x test
+  #     dependsOn:
+  #         - init-000
+  #     description: init task migrated from .gitpod.yml
+  #     name: 'Task 0: command'
+  #     triggeredBy:
+  #         - postDevcontainerStart

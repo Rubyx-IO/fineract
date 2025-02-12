@@ -3,33 +3,33 @@
 //
 // See https://aka.ms/devcontainer.json for more information.
 {
-	"name": "Gitpod",
-	"image": "mcr.microsoft.com/vscode/devcontainers/java:17-bookworm",
-	// instead of the build to use a pre-built image.
-	// "build": {
-    //     "context": ".",
-    //     "dockerfile": "Dockerfile"
-    // },
-	// Features add additional features to your environment. See https://containers.dev/features
-	// Beware: features are not supported on all platforms and may have unintended side-effects.
-	"features": {
-        // "ghcr.io/devcontainers/features/docker-in-docker:2": {},
-        "ghcr.io/devcontainers/features/java:1": {
-            "version": "17",
-            "distribution": "zulu",
-            "installMaven": true,
-            "installGradle": true
-        }
-	},
-	"customizations": {
-		"vscode": {
-			"extensions": [
-				"vscjava.vscode-java-pack",
-				"github.vscode-github-actions",
-				"GitHub.copilot",
-				"ms-vscode-remote.remote-containers",
-				"ms-azuretools.vscode-docker"
-			]
-		}
-	}
+  "name": "fineract",
+  "image": "gitpod/workspace-java-17:2025-02-10-10-54-28",
+  // instead of the build to use a pre-built image.
+  // "build": {
+  //     "context": ".",
+  //     "dockerfile": "Dockerfile"
+  // },
+  // Features add additional features to your environment. See https://containers.dev/features
+  // Beware: features are not supported on all platforms and may have unintended side-effects.
+  // "features": {
+  //   // "ghcr.io/devcontainers/features/docker-in-docker:2": {},
+  //   "ghcr.io/devcontainers/features/java:1": {
+  //     "version": "17",
+  //     "distribution": "zulu",
+  //     "installMaven": true,
+  //     "installGradle": true
+  //   }
+  // },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "vscjava.vscode-java-pack",
+        "github.vscode-github-actions",
+        "GitHub.copilot",
+        "ms-vscode-remote.remote-containers",
+        "ms-azuretools.vscode-docker"
+      ]
+    }
+  }
 }
