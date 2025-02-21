@@ -467,6 +467,7 @@ public class LoansApiResource {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = LoansApiResourceSwagger.GetLoansResponse.class))) })
     public String retrieveAll(@Context final UriInfo uriInfo,
+            @QueryParam("sqlSearch") @Parameter(description = "sqlSearch") final String sqlSearch,
             @QueryParam("externalId") @Parameter(description = "externalId") final String externalId,
             // @QueryParam("underHierarchy") final String hierarchy,
             @QueryParam("offset") @Parameter(description = "offset") final Integer offset,
@@ -482,7 +483,7 @@ public class LoansApiResource {
         sqlValidator.validate(sortOrder);
         sqlValidator.validate(accountNo);
         sqlValidator.validate(externalId);
-        final SearchParameters searchParameters = SearchParameters.builder().accountNo(accountNo).sortOrder(sortOrder)
+        final SearchParameters searchParameters = SearchParameters.builder().sqlSearch(sqlSearch).accountNo(accountNo).sortOrder(sortOrder)
                 .externalId(externalId).offset(offset).limit(limit).orderBy(orderBy).status(status).build();
 
         final Page<LoanAccountData> loanBasicDetails = this.loanReadPlatformService.retrieveAll(searchParameters);

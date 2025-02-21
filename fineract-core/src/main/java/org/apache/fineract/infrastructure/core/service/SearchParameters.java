@@ -55,6 +55,7 @@ public class SearchParameters {
     private Long categoryId;
     @Getter(AccessLevel.NONE)
     private Boolean isSelfUser;
+    private String sqlSearch;
 
     public Integer getLimit() {
         if (limit == null) {
@@ -126,5 +127,9 @@ public class SearchParameters {
 
     public boolean hasCategoryId() {
         return this.categoryId != null && this.categoryId != 0;
+    }
+
+    public boolean hasSqlSearch() {
+        return StringUtils.isNotBlank(this.sqlSearch);
     }
 }
