@@ -60,6 +60,7 @@ import org.apache.fineract.infrastructure.core.service.SearchParameters;
 import org.apache.fineract.infrastructure.core.service.database.DatabaseSpecificSQLGenerator;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.infrastructure.security.utils.ColumnValidator;
+import org.apache.fineract.infrastructure.security.utils.SQLInjectionValidator;
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
 import org.apache.fineract.organisation.monetary.domain.ApplicationCurrency;
 import org.apache.fineract.organisation.monetary.domain.ApplicationCurrencyRepositoryWrapper;
@@ -68,6 +69,8 @@ import org.apache.fineract.organisation.monetary.domain.Money;
 import org.apache.fineract.organisation.staff.data.StaffData;
 import org.apache.fineract.organisation.staff.service.StaffReadService;
 import org.apache.fineract.portfolio.account.data.AccountTransferData;
+import org.apache.fineract.portfolio.account.data.PortfolioAccountData;
+import org.apache.fineract.portfolio.account.domain.AccountAssociationType;
 import org.apache.fineract.portfolio.accountdetails.data.LoanAccountSummaryData;
 import org.apache.fineract.portfolio.accountdetails.domain.AccountType;
 import org.apache.fineract.portfolio.accountdetails.service.AccountDetailsReadPlatformService;
@@ -351,7 +354,19 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService, Loa
         extraCriterias.add(hierarchySearchString);
         extraCriterias.add(hierarchySearchString);
 
+        // try to get linked account
+        sqlBuilder.append("and (aa.association_type_enum is null or aa.association_type_enum = ?)");
+        extraCriterias.add(AccountAssociationType.LINKED_ACCOUNT_ASSOCIATION.getValue());
+        arrayPos = arrayPos + 1;
+
         if (searchParameters != null) {
+            if (searchParameters.hasSqlSearch()) {
+                String sqlQueryCriteria = searchParameters.getSqlSearch();
+                SQLInjectionValidator.validateSQLInput(sqlQueryCriteria);
+                sqlQueryCriteria = sqlQueryCriteria.replace("accountNo", "l.account_no");
+                this.columnValidator.validateSqlInjection(sqlBuilder.toString(), sqlQueryCriteria);
+                sqlBuilder.append(" and (").append(sqlQueryCriteria).append(")");
+            }
 
             if (StringUtils.isNotBlank(searchParameters.getStatus())) {
                 sqlBuilder.append(" and l.loan_status_id = ?");
@@ -790,6 +805,7 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService, Loa
                     + " lp.is_linked_to_floating_interest_rates as isLoanProductLinkedToFloatingRate, "
                     + " lp.allow_variabe_installments as isvariableInstallmentsAllowed, "
                     + " lp.allow_multiple_disbursals as multiDisburseLoan, lp.disallow_expected_disbursements as disallowExpectedDisbursements, "
+                    + " lsa.id as linkSavingsAccountId, lsa.account_no as linkSavingsAccountNo,"
                     + " lp.can_define_fixed_emi_amount as canDefineInstallmentAmount,"
                     + " c.id as clientId, c.account_no as clientAccountNo, c.display_name as clientName, c.office_id as clientOfficeId, c.external_id as clientExternalId,"
                     + " g.id as groupId, g.account_no as groupAccountNo, g.display_name as groupName,"
@@ -883,6 +899,8 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService, Loa
                     + sqlGenerator.escape("code") + " = l.currency_code" //
                     + " left join m_client c on c.id = l.client_id" //
                     + " left join m_group g on g.id = l.group_id" //
+                    + " left join m_portfolio_account_associations aa on aa.loan_account_id = l.id" //
+                    + " left join m_savings_account lsa on lsa.id = aa.linked_savings_account_id"
                     + " left join m_loan_arrears_aging la on la.loan_id = l.id" //
                     + " left join m_fund f on f.id = l.fund_id" //
                     + " left join m_staff s on s.id = l.loan_officer_id" //
@@ -1270,7 +1288,7 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService, Loa
                     rs.getString("buyDownFeeIncomeType"));
             final boolean merchantBuyDownFee = rs.getBoolean("merchantBuyDownFee");
 
-            return LoanAccountData.basicLoanDetails(id, accountNo, status, externalId, clientId, clientAccountNo, clientName,
+            LoanAccountData loanAccountData =  LoanAccountData.basicLoanDetails(id, accountNo, status, externalId, clientId, clientAccountNo, clientName,
                     clientOfficeId, clientExternalId, groupData, loanType, loanProductId, loanProductName, loanProductDescription,
                     isLoanProductLinkedToFloatingRate, fundId, fundName, loanPurposeId, loanPurposeName, loanOfficerId, loanOfficerName,
                     currencyData, proposedPrincipal, principal, approvedPrincipal, netDisbursalAmount, totalOverpaid, inArrearsTolerance,
@@ -1292,6 +1310,13 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService, Loa
                     daysInYearCustomStrategy, enableIncomeCapitalization, capitalizedIncomeCalculationType, capitalizedIncomeStrategy,
                     capitalizedIncomeType, enableBuyDownFee, buyDownFeeCalculationType, buyDownFeeStrategy, buyDownFeeIncomeType,
                     merchantBuyDownFee);
+            final Long linkSavingsAccountId = JdbcSupport.getLong(rs, "linkSavingsAccountId");
+            final String linkSavingsAccountNo = rs.getString("linkSavingsAccountNo");
+            if (linkSavingsAccountId != null) {
+                final PortfolioAccountData linkedAccount = PortfolioAccountData.lookup(linkSavingsAccountId, linkSavingsAccountNo);
+                loanAccountData.setLinkedAccount(linkedAccount);
+            }
+            return loanAccountData;
         }
     }
 

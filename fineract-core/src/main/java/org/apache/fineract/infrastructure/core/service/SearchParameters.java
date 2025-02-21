@@ -55,6 +55,7 @@ public class SearchParameters {
     private Long productId;
     private Long categoryId;
     private Integer legalForm;
+    private String sqlSearch;
 
     public Integer getLimit() {
         if (limit == null) {
@@ -134,5 +135,9 @@ public class SearchParameters {
 
     public boolean hasLegalForm() {
         return this.legalForm != null;
+    }
+
+    public boolean hasSqlSearch() {
+        return StringUtils.isNotBlank(this.sqlSearch);
     }
 }
