@@ -45,6 +45,7 @@ import org.apache.fineract.infrastructure.core.service.SearchParameters;
 import org.apache.fineract.infrastructure.core.service.database.DatabaseSpecificSQLGenerator;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.infrastructure.security.utils.ColumnValidator;
+import org.apache.fineract.infrastructure.security.utils.SQLInjectionValidator;
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
 import org.apache.fineract.portfolio.account.data.AccountTransferData;
 import org.apache.fineract.portfolio.client.data.ClientData;
@@ -176,6 +177,21 @@ public class SavingsAccountReadPlatformServiceImpl implements SavingsAccountRead
         objectArray[0] = hierarchySearchString;
         int arrayPos = 1;
         if (searchParameters != null) {
+            // add sql serach to the query
+            if (searchParameters.hasSqlSearch()) {
+                String sqlQueryCriteria = searchParameters.getSqlSearch();
+                SQLInjectionValidator.validateSQLInput(sqlQueryCriteria);
+                // sqlQueryCriteria = sqlQueryCriteria.replace("accountNo", "l.account_no");
+                this.columnValidator.validateSqlInjection(sqlBuilder.toString(), sqlQueryCriteria);
+                sqlBuilder.append(" and (").append(sqlQueryCriteria).append(")");
+            }
+
+            // add client id to the query
+            if (searchParameters.hasClientId()) {
+                sqlBuilder.append(" and sa.client_id = ?");
+                objectArray[arrayPos] = searchParameters.getClientId();
+                arrayPos = arrayPos + 1;
+            }
 
             if (StringUtils.isNotBlank(searchParameters.getStatus())) {
                 sqlBuilder.append(" and sa.status_enum = ?");
