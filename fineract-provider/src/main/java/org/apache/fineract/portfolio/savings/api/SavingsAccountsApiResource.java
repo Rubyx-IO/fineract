@@ -127,6 +127,8 @@ public class SavingsAccountsApiResource {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = SavingsAccountsApiResourceSwagger.GetSavingsAccountsResponse.class))) })
     public String retrieveAll(@Context final UriInfo uriInfo,
+            @QueryParam("sqlSearch") @Parameter(description = "sqlSearch") final String sqlSearch,
+            @QueryParam("clientId") @Parameter(description = "clientId") final String clientId,
             @QueryParam("externalId") @Parameter(description = "externalId") final String externalId,
             // @QueryParam("underHierarchy") final String hierarchy,
             @QueryParam("offset") @Parameter(description = "offset") final Integer offset,
@@ -136,10 +138,12 @@ public class SavingsAccountsApiResource {
 
         context.authenticatedUser().validateHasReadPermission(SavingsApiConstants.SAVINGS_ACCOUNT_RESOURCE_NAME);
 
+        sqlValidator.validate(sqlSearch);
+        sqlValidator.validate(clientId);
         sqlValidator.validate(orderBy);
         sqlValidator.validate(sortOrder);
         sqlValidator.validate(externalId);
-        final SearchParameters searchParameters = SearchParameters.builder().limit(limit).externalId(externalId).offset(offset)
+        final SearchParameters searchParameters = SearchParameters.builder().limit(limit).externalId(externalId).offset(offset).clientId(clientId).sqlSearch(sqlSearch)
                 .orderBy(orderBy).sortOrder(sortOrder).build();
 
         final Page<SavingsAccountData> products = savingsAccountReadPlatformService.retrieveAll(searchParameters);

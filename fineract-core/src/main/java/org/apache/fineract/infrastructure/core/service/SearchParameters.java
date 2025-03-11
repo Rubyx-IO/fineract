@@ -56,6 +56,7 @@ public class SearchParameters {
     @Getter(AccessLevel.NONE)
     private Boolean isSelfUser;
     private String sqlSearch;
+    private String clientId;
 
     public Integer getLimit() {
         if (limit == null) {
@@ -131,5 +132,9 @@ public class SearchParameters {
 
     public boolean hasSqlSearch() {
         return StringUtils.isNotBlank(this.sqlSearch);
+    }
+
+    public boolean hasClientId() {
+        return StringUtils.isNotBlank(this.clientId);
     }
 }
