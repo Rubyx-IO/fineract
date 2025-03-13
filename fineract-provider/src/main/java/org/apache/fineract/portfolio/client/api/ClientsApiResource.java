@@ -138,8 +138,10 @@ public class ClientsApiResource {
     @AlternativeOperationId("retrieveAll_21")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ClientsApiResourceSwagger.GetClientsResponse.class)))
     public String retrieveAll(@Context final UriInfo uriInfo,
+            @QueryParam("sqlSearch") @Parameter(description = "sqlSearch") final String sqlSearch,
             @QueryParam("officeId") @Parameter(description = "officeId") final Long officeId,
             @QueryParam("externalId") @Parameter(description = "externalId") final String externalId,
+            @QueryParam("mobileNo") @Parameter(description = "mobileNo") final String mobileNo,
             @QueryParam("displayName") @Parameter(description = "displayName") final String displayName,
             @QueryParam("firstName") @Parameter(description = "firstName") final String firstname,
             @QueryParam("lastName") @Parameter(description = "lastName") final String lastname,
@@ -153,8 +155,20 @@ public class ClientsApiResource {
             @QueryParam("legalForm") final Integer legalForm,
             @QueryParam("staffId") @Parameter(description = "staffId") final Long staffId) {
 
-        return retrieveAll(uriInfo, officeId, externalId, displayName, firstname, lastname, status, legalForm, hierarchy, offset, limit,
-                orderBy, sortOrder, orphansOnly, staffId);
+        context.authenticatedUser().validateHasReadPermission(ClientApiConstants.CLIENT_RESOURCE_NAME);
+        sqlValidator.validate(orderBy);
+        sqlValidator.validate(sortOrder);
+        sqlValidator.validate(externalId);
+        sqlValidator.validate(hierarchy);
+        sqlValidator.validate(sqlSearch);
+        sqlValidator.validate(mobileNo);
+        final SearchParameters searchParameters = SearchParameters.builder().limit(limit).officeId(officeId)
+                .externalId(externalId).name(displayName).hierarchy(hierarchy).firstname(firstname).lastname(lastname)
+                .status(status).orphansOnly(orphansOnly).legalForm(legalForm).staffId(staffId).sqlSearch(sqlSearch)
+                .mobileNo(mobileNo).offset(offset).orderBy(orderBy).sortOrder(sortOrder).build();
+        final Page<ClientData> clientData = clientReadPlatformService.retrieveAll(searchParameters);
+        final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+        return toApiJsonSerializer.serialize(settings, clientData, ClientApiConstants.CLIENT_RESPONSE_DATA_PARAMETERS);
     }
 
     @GET
@@ -453,7 +467,8 @@ public class ClientsApiResource {
                 .name(displayName).hierarchy(hierarchy).firstname(firstname).lastname(lastname).status(status).orphansOnly(orphansOnly)
                 .offset(offset).orderBy(orderBy).sortOrder(sortOrder).legalForm(legalForm).staffId(staffId).build();
         final Page<ClientData> clientData = clientReadPlatformService.retrieveAll(searchParameters);
-        final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+        final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper
+                .process(uriInfo.getQueryParameters());
         return toApiJsonSerializer.serialize(settings, clientData, ClientApiConstants.CLIENT_RESPONSE_DATA_PARAMETERS);
     }
 

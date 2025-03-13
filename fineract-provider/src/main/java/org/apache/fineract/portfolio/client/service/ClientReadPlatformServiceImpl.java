@@ -47,6 +47,7 @@ import org.apache.fineract.infrastructure.security.exception.InputValidationExce
 import org.apache.fineract.infrastructure.security.service.InputValidator;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.infrastructure.security.utils.ColumnValidator;
+import org.apache.fineract.infrastructure.security.utils.SQLInjectionValidator;
 import org.apache.fineract.portfolio.client.data.ClientCollateralManagementData;
 import org.apache.fineract.portfolio.client.data.ClientData;
 import org.apache.fineract.portfolio.client.data.ClientNonPersonData;
@@ -119,6 +120,17 @@ public class ClientReadPlatformServiceImpl implements ClientReadPlatformService 
         sqlBuilder.append(" where (o.hierarchy like ? or transferToOffice.hierarchy like ?) ");
 
         if (searchParameters != null) {
+            if (searchParameters.hasSqlSearch()) {
+                String sqlQueryCriteria = searchParameters.getSqlSearch();
+                SQLInjectionValidator.validateSQLInput(sqlQueryCriteria);
+                this.columnValidator.validateSqlInjection(sqlBuilder.toString(), sqlQueryCriteria);
+                sqlBuilder.append(" and (").append(sqlQueryCriteria).append(")");
+            }
+
+            if (searchParameters.hasMobileNo()) {
+                sqlBuilder.append("and c.mobile_no = ?");
+                paramList.add(searchParameters.getMobileNo());
+            }
 
             final String extraCriteria = buildSqlStringFromClientCriteria(this.clientToDataMapper.schema(), searchParameters, paramList);
 
