@@ -138,8 +138,10 @@ public class ClientsApiResource {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ClientsApiResourceSwagger.GetClientsResponse.class))) })
     public String retrieveAll(@Context final UriInfo uriInfo,
+            @QueryParam("sqlSearch") @Parameter(description = "sqlSearch") final String sqlSearch,
             @QueryParam("officeId") @Parameter(description = "officeId") final Long officeId,
             @QueryParam("externalId") @Parameter(description = "externalId") final String externalId,
+            @QueryParam("mobileNo") @Parameter(description = "mobileNo") final String mobileNo,
             @QueryParam("displayName") @Parameter(description = "displayName") final String displayName,
             @QueryParam("firstName") @Parameter(description = "firstName") final String firstname,
             @QueryParam("lastName") @Parameter(description = "lastName") final String lastname,
@@ -150,9 +152,25 @@ public class ClientsApiResource {
             @QueryParam("orderBy") @Parameter(description = "orderBy") final String orderBy,
             @QueryParam("sortOrder") @Parameter(description = "sortOrder") final String sortOrder,
             @QueryParam("orphansOnly") @Parameter(description = "orphansOnly") final Boolean orphansOnly) {
-
-        return retrieveAll(uriInfo, officeId, externalId, displayName, firstname, lastname, status, hierarchy, offset, limit, orderBy,
-                sortOrder, orphansOnly, false);
+    
+        context.authenticatedUser().validateHasReadPermission(ClientApiConstants.CLIENT_RESOURCE_NAME);
+        sqlValidator.validate(orderBy);
+        sqlValidator.validate(sortOrder);
+        sqlValidator.validate(externalId);
+        sqlValidator.validate(hierarchy);
+        sqlValidator.validate(sqlSearch);
+        sqlValidator.validate(mobileNo);
+        final SearchParameters searchParameters = SearchParameters.builder().limit(limit).officeId(officeId)
+                .externalId(externalId)
+                .name(displayName).hierarchy(hierarchy).firstname(firstname).lastname(lastname).status(status)
+                .orphansOnly(orphansOnly)
+                .sqlSearch(sqlSearch)
+                .mobileNo(mobileNo)
+                .isSelfUser(false).offset(offset).orderBy(orderBy).sortOrder(sortOrder).build();
+        final Page<ClientData> clientData = clientReadPlatformService.retrieveAll(searchParameters);
+        final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper
+                .process(uriInfo.getQueryParameters());
+        return toApiJsonSerializer.serialize(settings, clientData, ClientApiConstants.CLIENT_RESPONSE_DATA_PARAMETERS);
     }
 
     @GET
@@ -443,17 +461,21 @@ public class ClientsApiResource {
 
     public String retrieveAll(final UriInfo uriInfo, final Long officeId, final String externalId, final String displayName,
             final String firstname, final String lastname, final String status, final String hierarchy, final Integer offset,
-            final Integer limit, final String orderBy, final String sortOrder, final Boolean orphansOnly, final boolean isSelfUser) {
+            final Integer limit, final String orderBy, final String sortOrder, final Boolean orphansOnly,
+            final boolean isSelfUser) {
         context.authenticatedUser().validateHasReadPermission(ClientApiConstants.CLIENT_RESOURCE_NAME);
         sqlValidator.validate(orderBy);
         sqlValidator.validate(sortOrder);
         sqlValidator.validate(externalId);
         sqlValidator.validate(hierarchy);
-        final SearchParameters searchParameters = SearchParameters.builder().limit(limit).officeId(officeId).externalId(externalId)
-                .name(displayName).hierarchy(hierarchy).firstname(firstname).lastname(lastname).status(status).orphansOnly(orphansOnly)
+        final SearchParameters searchParameters = SearchParameters.builder().limit(limit).officeId(officeId)
+                .externalId(externalId)
+                .name(displayName).hierarchy(hierarchy).firstname(firstname).lastname(lastname).status(status)
+                .orphansOnly(orphansOnly)
                 .isSelfUser(isSelfUser).offset(offset).orderBy(orderBy).sortOrder(sortOrder).build();
         final Page<ClientData> clientData = clientReadPlatformService.retrieveAll(searchParameters);
-        final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+        final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper
+                .process(uriInfo.getQueryParameters());
         return toApiJsonSerializer.serialize(settings, clientData, ClientApiConstants.CLIENT_RESPONSE_DATA_PARAMETERS);
     }
 
