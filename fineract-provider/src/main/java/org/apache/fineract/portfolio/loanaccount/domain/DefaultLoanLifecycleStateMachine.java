@@ -18,6 +18,7 @@
  */
 package org.apache.fineract.portfolio.loanaccount.domain;
 
+import java.math.BigDecimal;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.event.business.domain.loan.LoanStatusChangedBusinessEvent;
@@ -145,6 +146,18 @@ public class DefaultLoanLifecycleStateMachine implements LoanLifecycleStateMachi
             case LOAN_WITHDRAW_TRANSFER:
                 if (anyOfAllowedWhenComingFrom(from, LoanStatus.TRANSFER_IN_PROGRESS)) {
                     newState = activeTransition();
+                }
+            break;
+            case LOAN_COMPLETE_TRANSFER:
+                if (anyOfAllowedWhenComingFrom(from, LoanStatus.TRANSFER_IN_PROGRESS)) {
+                    final boolean isOverpaid = loan.getTotalOverpaid() != null && loan.getTotalOverpaid().compareTo(BigDecimal.ZERO) > 0;
+                    if (isOverpaid) {
+                        newState = overpaidTransition();
+                    } else if (loan.getLoanSummary().isRepaidInFull(loan.getCurrency())) {
+                        newState = closeObligationsMetTransition();
+                    } else {
+                        newState = activeTransition();
+                    }
                 }
             break;
             case WRITE_OFF_OUTSTANDING_UNDO:
