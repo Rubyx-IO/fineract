@@ -18,6 +18,14 @@
  */
 apply plugin: 'io.spring.dependency-management'
 
+// VUL-53: the Spring Boot Gradle plugin imports its own BOM last, which overrides the BOM versions
+// below. Setting the Boot version properties is the supported way to change what that BOM manages.
+ext['spring-framework.version'] = '6.1.21'
+ext['spring-security.version'] = '6.2.8'
+ext['tomcat.version'] = '10.1.62'
+ext['jackson-bom.version'] = '2.18.12'
+ext['netty.version'] = '4.1.141.Final'
+
 // Configuration for the dependency management plugin
 // https://github.com/spring-gradle-plugins/dependency-management-plugin
 dependencyManagement {
@@ -247,7 +255,7 @@ dependencyManagement {
             exclude 'org.slf4j:slf4j-api'
         }
 
-        dependency 'org.postgresql:postgresql:42.7.1'
+        dependency 'org.postgresql:postgresql:42.7.14'
 
         dependency 'org.assertj:assertj-core:3.25.3'
 
