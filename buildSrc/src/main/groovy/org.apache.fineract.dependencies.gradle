@@ -71,7 +71,6 @@ dependencyManagement {
         dependency 'com.nimbusds:nimbus-jose-jwt:9.48'
         dependency 'net.minidev:json-smart:2.5.2'
         dependency 'com.google.protobuf:protobuf-java:3.25.9'
-        dependency 'org.lz4:lz4-java:1.8.1'
 
 
         dependency 'org.eclipse.persistence:org.eclipse.persistence.jpa:4.0.0'
