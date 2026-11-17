@@ -162,10 +162,10 @@ public class ClientsApiResource {
         sqlValidator.validate(hierarchy);
         sqlValidator.validate(sqlSearch);
         sqlValidator.validate(mobileNo);
-        final SearchParameters searchParameters = SearchParameters.builder().limit(limit).officeId(officeId)
-                .externalId(externalId).name(displayName).hierarchy(hierarchy).firstname(firstname).lastname(lastname)
-                .status(status).orphansOnly(orphansOnly).legalForm(legalForm).staffId(staffId).sqlSearch(sqlSearch)
-                .mobileNo(mobileNo).offset(offset).orderBy(orderBy).sortOrder(sortOrder).build();
+        final SearchParameters searchParameters = SearchParameters.builder().limit(limit).officeId(officeId).externalId(externalId)
+                .name(displayName).hierarchy(hierarchy).firstname(firstname).lastname(lastname).status(status).orphansOnly(orphansOnly)
+                .legalForm(legalForm).staffId(staffId).sqlSearch(sqlSearch).mobileNo(mobileNo).offset(offset).orderBy(orderBy)
+                .sortOrder(sortOrder).build();
         final Page<ClientData> clientData = clientReadPlatformService.retrieveAll(searchParameters);
         final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return toApiJsonSerializer.serialize(settings, clientData, ClientApiConstants.CLIENT_RESPONSE_DATA_PARAMETERS);
@@ -467,8 +467,7 @@ public class ClientsApiResource {
                 .name(displayName).hierarchy(hierarchy).firstname(firstname).lastname(lastname).status(status).orphansOnly(orphansOnly)
                 .offset(offset).orderBy(orderBy).sortOrder(sortOrder).legalForm(legalForm).staffId(staffId).build();
         final Page<ClientData> clientData = clientReadPlatformService.retrieveAll(searchParameters);
-        final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper
-                .process(uriInfo.getQueryParameters());
+        final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return toApiJsonSerializer.serialize(settings, clientData, ClientApiConstants.CLIENT_RESPONSE_DATA_PARAMETERS);
     }
 

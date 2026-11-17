@@ -141,8 +141,8 @@ public class SavingsAccountsApiResource {
         sqlValidator.validate(orderBy);
         sqlValidator.validate(sortOrder);
         sqlValidator.validate(externalId);
-        final SearchParameters searchParameters = SearchParameters.builder().limit(limit).externalId(externalId).offset(offset).clientId(clientId).sqlSearch(sqlSearch)
-                .orderBy(orderBy).sortOrder(sortOrder).build();
+        final SearchParameters searchParameters = SearchParameters.builder().limit(limit).externalId(externalId).offset(offset)
+                .clientId(clientId).sqlSearch(sqlSearch).orderBy(orderBy).sortOrder(sortOrder).build();
 
         final Page<SavingsAccountData> products = savingsAccountReadPlatformService.retrieveAll(searchParameters);
 
