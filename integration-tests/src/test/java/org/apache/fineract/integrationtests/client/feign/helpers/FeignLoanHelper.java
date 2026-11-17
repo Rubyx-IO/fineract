@@ -209,7 +209,8 @@ public class FeignLoanHelper {
     }
 
     public GetLoansResponse retrieveAllLoans(String accountNumber, String associations, Long clientId) {
-        return ok(() -> fineractClient.loans().retrieveAllLoans(null, 0, 10, null, null, accountNumber, associations, clientId, null));
+        return ok(
+                () -> fineractClient.loans().retrieveAllLoans(null, null, 0, 10, null, null, accountNumber, associations, clientId, null));
     }
 
     public PostLoansLoanIdResponse approveLoan(Long loanId, PostLoansLoanIdRequest request) {
