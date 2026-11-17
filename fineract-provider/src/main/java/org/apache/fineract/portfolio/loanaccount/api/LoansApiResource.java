@@ -509,6 +509,7 @@ public class LoansApiResource {
         sqlValidator.validate(sortOrder);
         sqlValidator.validate(accountNo);
         sqlValidator.validate(externalId);
+        sqlValidator.validate(sqlSearch);
         final SearchParameters searchParameters = SearchParameters.builder().sqlSearch(sqlSearch).accountNo(accountNo).sortOrder(sortOrder)
                 .externalId(externalId).offset(offset).limit(limit).orderBy(orderBy).status(status).clientId(clientId).build();
 

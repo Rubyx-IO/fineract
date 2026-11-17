@@ -41,6 +41,7 @@ public final class SQLInjectionValidator {
         if (StringUtils.isBlank(sqlSearch)) {
             return;
         }
+        validateParentheses(sqlSearch);
         String lowerCaseSQL = sqlSearch.toLowerCase();
         for (String ddl : DDL_COMMANDS) {
             if (lowerCaseSQL.contains(ddl)) {
@@ -121,6 +122,27 @@ public final class SQLInjectionValidator {
         Pattern pattern = Pattern.compile(SQL_PATTERN);
         Matcher matcher = pattern.matcher(sqlSearch);
         if (!matcher.matches()) {
+            throw new SQLInjectionException();
+        }
+    }
+
+    private static void validateParentheses(final String sqlSearch) {
+        if (sqlSearch.indexOf('?') >= 0) {
+            throw new SQLInjectionException();
+        }
+        int depth = 0;
+        for (int i = 0; i < sqlSearch.length(); i++) {
+            char c = sqlSearch.charAt(i);
+            if (c == '(') {
+                depth++;
+            } else if (c == ')') {
+                depth--;
+                if (depth < 0) {
+                    throw new SQLInjectionException();
+                }
+            }
+        }
+        if (depth != 0) {
             throw new SQLInjectionException();
         }
     }

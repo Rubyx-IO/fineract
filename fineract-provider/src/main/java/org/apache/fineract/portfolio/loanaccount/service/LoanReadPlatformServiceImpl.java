@@ -354,11 +354,6 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService, Loa
         extraCriterias.add(hierarchySearchString);
         extraCriterias.add(hierarchySearchString);
 
-        // try to get linked account
-        sqlBuilder.append("and (aa.association_type_enum is null or aa.association_type_enum = ?)");
-        extraCriterias.add(AccountAssociationType.LINKED_ACCOUNT_ASSOCIATION.getValue());
-        arrayPos = arrayPos + 1;
-
         if (searchParameters != null) {
             if (searchParameters.hasSqlSearch()) {
                 String sqlQueryCriteria = searchParameters.getSqlSearch();
@@ -899,8 +894,11 @@ public class LoanReadPlatformServiceImpl implements LoanReadPlatformService, Loa
                     + sqlGenerator.escape("code") + " = l.currency_code" //
                     + " left join m_client c on c.id = l.client_id" //
                     + " left join m_group g on g.id = l.group_id" //
-                    + " left join m_portfolio_account_associations aa on aa.loan_account_id = l.id" //
-                    + " left join m_savings_account lsa on lsa.id = aa.linked_savings_account_id"
+                    + " left join (select loan_account_id, max(linked_savings_account_id) as linked_savings_account_id"
+                    + " from m_portfolio_account_associations where association_type_enum = "
+                    + AccountAssociationType.LINKED_ACCOUNT_ASSOCIATION.getValue()
+                    + " group by loan_account_id) aa on aa.loan_account_id = l.id" //
+                    + " left join m_savings_account lsa on lsa.id = aa.linked_savings_account_id" //
                     + " left join m_loan_arrears_aging la on la.loan_id = l.id" //
                     + " left join m_fund f on f.id = l.fund_id" //
                     + " left join m_staff s on s.id = l.loan_officer_id" //
