@@ -125,7 +125,7 @@ public final class SQLInjectionValidator {
     }
 
     private static boolean isAllowedOutsideQuotes(final char c) {
-        boolean asciiLetterOrDigit = c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z' || c >= '0' && c <= '9';
+        boolean asciiLetterOrDigit = (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9');
         return asciiLetterOrDigit || c == '_' || c == '=' || c == ',' || c == '-' || c == '!' || c == '>' || c == '<' || c == '.'
                 || c == '%' || c == '*' || c == ' ' || c == '\n' || c == '\r' || c == '\t' || c == '(' || c == ')';
     }
@@ -145,7 +145,7 @@ public final class SQLInjectionValidator {
     }
 
     private static boolean isWordChar(final char c) {
-        return c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z' || c >= '0' && c <= '9' || c == '_';
+        return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '_';
     }
 
     public static void validateAdhocQuery(final String sqlSearch) {
