@@ -1681,7 +1681,7 @@ public class LoanTransactionHelper {
     // org.apache.fineract.client.models.PostLoansLoanIdRequest)
 
     public GetLoansResponse retrieveAllLoans(final String accountNumber, final String associations, final Long clientId) {
-        return Calls.ok(FineractClientHelper.getFineractClient().loans.retrieveAllLoans(null, 0, 10, null, null, accountNumber,
+        return Calls.ok(FineractClientHelper.getFineractClient().loans.retrieveAllLoans(null, null, 0, 10, null, null, accountNumber,
                 associations, clientId, null));
     }
 

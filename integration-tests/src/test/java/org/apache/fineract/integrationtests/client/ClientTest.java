@@ -62,8 +62,8 @@ public class ClientTest extends FeignIntegrationTest {
     }
 
     Optional<Long> retrieveFirst() {
-        GetClientsResponse clients = ok(() -> fineractClient().clients().retrieveAllClients(null, null, null, null, null, null, null, 0, 1,
-                null, null, false, null, null));
+        GetClientsResponse clients = ok(() -> fineractClient().clients().retrieveAllClients(null, null, null, null, null, null, null, null,
+                null, 0, 1, null, null, false, null, null));
         if (clients.getTotalFilteredRecords() != null && clients.getTotalFilteredRecords() > 0) {
             return clients.getPageItems().stream().findFirst().map(item -> item.getId());
         }
