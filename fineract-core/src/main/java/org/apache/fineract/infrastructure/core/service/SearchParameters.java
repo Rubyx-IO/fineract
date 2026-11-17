@@ -56,7 +56,6 @@ public class SearchParameters {
     private Long categoryId;
     private Integer legalForm;
     private String sqlSearch;
-    private String clientId;
     private String mobileNo;
 
     public Integer getLimit() {
@@ -144,7 +143,7 @@ public class SearchParameters {
     }
 
     public boolean hasClientId() {
-        return StringUtils.isNotBlank(this.clientId);
+        return this.clientId != null && this.clientId != 0;
     }
 
     public boolean hasMobileNo() {
