@@ -60,7 +60,7 @@ public final class SQLInjectionValidator {
             }
             if (c == '\'' || c == '"' || c == '`') {
                 quote = c;
-                unquoted.append('q');
+                unquoted.append(" q");
                 continue;
             }
             if (c == '(') {

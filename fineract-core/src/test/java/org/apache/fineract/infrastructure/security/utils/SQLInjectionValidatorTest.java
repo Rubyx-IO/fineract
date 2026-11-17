@@ -42,6 +42,8 @@ class SQLInjectionValidatorTest {
         assertDoesNotThrow(() -> SQLInjectionValidator.validateSQLInput("c.display_name ilike '%Callum%' or c.account_no like 'Callum%'"));
         assertDoesNotThrow(() -> SQLInjectionValidator.validateSQLInput("c.display_name like '%José%'"));
         assertDoesNotThrow(() -> SQLInjectionValidator.validateSQLInput("c.display_name = 'O''Brien (Ltd)'"));
+        assertDoesNotThrow(() -> SQLInjectionValidator.validateSQLInput("c.display_name = 'select'"));
+        assertDoesNotThrow(() -> SQLInjectionValidator.validateSQLInput("c.display_name = 'a=a'"));
     }
 
     @Test
@@ -69,5 +71,6 @@ class SQLInjectionValidatorTest {
         assertThrows(SQLInjectionException.class, () -> SQLInjectionValidator.validateSQLInput("c.id = c.id"));
         assertThrows(SQLInjectionException.class, () -> SQLInjectionValidator.validateSQLInput("call some procedure"));
         assertThrows(SQLInjectionException.class, () -> SQLInjectionValidator.validateSQLInput("select * from m_client"));
+        assertThrows(SQLInjectionException.class, () -> SQLInjectionValidator.validateSQLInput("exists(select'1' from m_client)"));
     }
 }
