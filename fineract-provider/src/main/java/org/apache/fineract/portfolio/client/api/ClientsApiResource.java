@@ -152,7 +152,7 @@ public class ClientsApiResource {
             @QueryParam("orderBy") @Parameter(description = "orderBy") final String orderBy,
             @QueryParam("sortOrder") @Parameter(description = "sortOrder") final String sortOrder,
             @QueryParam("orphansOnly") @Parameter(description = "orphansOnly") final Boolean orphansOnly) {
-    
+
         context.authenticatedUser().validateHasReadPermission(ClientApiConstants.CLIENT_RESOURCE_NAME);
         sqlValidator.validate(orderBy);
         sqlValidator.validate(sortOrder);
@@ -160,16 +160,11 @@ public class ClientsApiResource {
         sqlValidator.validate(hierarchy);
         sqlValidator.validate(sqlSearch);
         sqlValidator.validate(mobileNo);
-        final SearchParameters searchParameters = SearchParameters.builder().limit(limit).officeId(officeId)
-                .externalId(externalId)
-                .name(displayName).hierarchy(hierarchy).firstname(firstname).lastname(lastname).status(status)
-                .orphansOnly(orphansOnly)
-                .sqlSearch(sqlSearch)
-                .mobileNo(mobileNo)
-                .isSelfUser(false).offset(offset).orderBy(orderBy).sortOrder(sortOrder).build();
+        final SearchParameters searchParameters = SearchParameters.builder().limit(limit).officeId(officeId).externalId(externalId)
+                .name(displayName).hierarchy(hierarchy).firstname(firstname).lastname(lastname).status(status).orphansOnly(orphansOnly)
+                .sqlSearch(sqlSearch).mobileNo(mobileNo).isSelfUser(false).offset(offset).orderBy(orderBy).sortOrder(sortOrder).build();
         final Page<ClientData> clientData = clientReadPlatformService.retrieveAll(searchParameters);
-        final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper
-                .process(uriInfo.getQueryParameters());
+        final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return toApiJsonSerializer.serialize(settings, clientData, ClientApiConstants.CLIENT_RESPONSE_DATA_PARAMETERS);
     }
 
@@ -461,21 +456,17 @@ public class ClientsApiResource {
 
     public String retrieveAll(final UriInfo uriInfo, final Long officeId, final String externalId, final String displayName,
             final String firstname, final String lastname, final String status, final String hierarchy, final Integer offset,
-            final Integer limit, final String orderBy, final String sortOrder, final Boolean orphansOnly,
-            final boolean isSelfUser) {
+            final Integer limit, final String orderBy, final String sortOrder, final Boolean orphansOnly, final boolean isSelfUser) {
         context.authenticatedUser().validateHasReadPermission(ClientApiConstants.CLIENT_RESOURCE_NAME);
         sqlValidator.validate(orderBy);
         sqlValidator.validate(sortOrder);
         sqlValidator.validate(externalId);
         sqlValidator.validate(hierarchy);
-        final SearchParameters searchParameters = SearchParameters.builder().limit(limit).officeId(officeId)
-                .externalId(externalId)
-                .name(displayName).hierarchy(hierarchy).firstname(firstname).lastname(lastname).status(status)
-                .orphansOnly(orphansOnly)
+        final SearchParameters searchParameters = SearchParameters.builder().limit(limit).officeId(officeId).externalId(externalId)
+                .name(displayName).hierarchy(hierarchy).firstname(firstname).lastname(lastname).status(status).orphansOnly(orphansOnly)
                 .isSelfUser(isSelfUser).offset(offset).orderBy(orderBy).sortOrder(sortOrder).build();
         final Page<ClientData> clientData = clientReadPlatformService.retrieveAll(searchParameters);
-        final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper
-                .process(uriInfo.getQueryParameters());
+        final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return toApiJsonSerializer.serialize(settings, clientData, ClientApiConstants.CLIENT_RESPONSE_DATA_PARAMETERS);
     }
 
